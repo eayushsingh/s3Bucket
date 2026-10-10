@@ -12,12 +12,20 @@ import {
   CheckCircle2,
   ExternalLink,
   Code2,
+  Download,
+  Copy,
+  Check,
 } from "lucide-react";
 import { LIBRARIES_REGISTRY, searchLibraries, getLibrariesByCategory } from "@/lib/technology-stack";
 import { LibraryCard } from "./about/LibraryCard";
 import { CategoryFilter } from "./about/CategoryFilter";
 import { ArchitectureDiagram } from "./about/ArchitectureDiagram";
 import { SystemRuntimeSpecs } from "./about/SystemRuntimeSpecs";
+import { SdkComparisonSection } from "./about/SdkComparisonSection";
+import { ZeroRamExplainer } from "./about/ZeroRamExplainer";
+import { SqliteAuditExplainer } from "./about/SqliteAuditExplainer";
+import { ZodValidationExplainer } from "./about/ZodValidationExplainer";
+import { exportDependencies, ExportFormat } from "@/lib/sbom-exporter";
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -35,6 +43,18 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   );
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
+
+  const handleCopySbom = async (format: ExportFormat) => {
+    try {
+      const text = exportDependencies(format);
+      await navigator.clipboard.writeText(text);
+      setCopiedFormat(format);
+      setTimeout(() => setCopiedFormat(null), 2500);
+    } catch (e) {
+      console.error("Failed to copy SBOM to clipboard", e);
+    }
+  };
 
   // Category counts
   const categoryCounts = useMemo(() => {
@@ -184,6 +204,54 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                 </div>
               </div>
 
+              {/* SBOM Export Ribbon */}
+              <div className="p-2.5 rounded-lg bg-zinc-900/40 border border-zinc-800/80 flex items-center justify-between flex-wrap gap-2 font-mono text-[11px]">
+                <div className="flex items-center gap-2 text-zinc-400">
+                  <Download className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Export Software Bill of Materials (SBOM):</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => handleCopySbom("json")}
+                    className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition flex items-center gap-1 text-[10px]"
+                    title="Copy full JSON inventory"
+                  >
+                    {copiedFormat === "json" ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-zinc-400" />
+                    )}
+                    <span>{copiedFormat === "json" ? "Copied JSON" : "Copy JSON"}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCopySbom("markdown")}
+                    className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition flex items-center gap-1 text-[10px]"
+                    title="Copy Markdown report table"
+                  >
+                    {copiedFormat === "markdown" ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-zinc-400" />
+                    )}
+                    <span>{copiedFormat === "markdown" ? "Copied MD" : "Copy Markdown"}</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCopySbom("cyclonedx")}
+                    className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition flex items-center gap-1 text-[10px]"
+                    title="Copy CycloneDX 1.5 standard SBOM"
+                  >
+                    {copiedFormat === "cyclonedx" ? (
+                      <Check className="w-3 h-3 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-zinc-400" />
+                    )}
+                    <span>{copiedFormat === "cyclonedx" ? "Copied CycloneDX" : "CycloneDX 1.5"}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Grid of Libraries */}
               {filteredLibraries.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -209,7 +277,15 @@ export const AboutModal: React.FC<AboutModalProps> = ({
           )}
 
           {/* TAB 2: ARCHITECTURE */}
-          {activeTab === "architecture" && <ArchitectureDiagram />}
+          {activeTab === "architecture" && (
+            <div className="space-y-4">
+              <ArchitectureDiagram />
+              <ZeroRamExplainer />
+              <SdkComparisonSection />
+              <SqliteAuditExplainer />
+              <ZodValidationExplainer />
+            </div>
+          )}
 
           {/* TAB 3: RUNTIME SPECS */}
           {activeTab === "runtime" && <SystemRuntimeSpecs />}

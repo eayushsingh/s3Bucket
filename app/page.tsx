@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
   BarChart3,
   Search,
+  Info,
 } from "lucide-react";
 import { HealthBadge } from "@/components/HealthBadge";
 import { BucketManager } from "@/components/BucketManager";
@@ -27,6 +28,7 @@ import { AuditLogDrawer } from "@/components/AuditLogDrawer";
 import { DiagnosticsModal } from "@/components/DiagnosticsModal";
 import { BucketPropertiesModal } from "@/components/BucketPropertiesModal";
 import { BucketMetricsModal } from "@/components/BucketMetricsModal";
+import { AboutModal } from "@/components/AboutModal";
 import { ToastProvider, useToast } from "@/components/ToastContext";
 import { BucketInfo } from "@/storage/storage.types";
 
@@ -41,6 +43,7 @@ function StorageDashboardContent() {
   const [loadingObjects, setLoadingObjects] = useState(false);
 
   // Modals & Drawers
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
@@ -227,6 +230,15 @@ function StorageDashboardContent() {
           </button>
 
           <button
+            onClick={() => setIsAboutOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded transition"
+            title="About System & Libraries (A)"
+          >
+            <Info className="w-3.5 h-3.5 text-sky-400" />
+            <span className="hidden sm:inline text-[11px]">About</span>
+          </button>
+
+          <button
             onClick={() => setIsShortcutsOpen(true)}
             className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded transition"
             title="Keyboard Shortcuts Reference (?)"
@@ -366,6 +378,11 @@ function StorageDashboardContent() {
       <DiagnosticsModal
         isOpen={isDiagnosticsOpen}
         onClose={() => setIsDiagnosticsOpen(false)}
+      />
+
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
       />
 
       {selectedBucket && (

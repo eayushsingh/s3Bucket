@@ -365,6 +365,7 @@ function StorageDashboardContent() {
         onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
         onOpenProperties={() => setIsPropertiesOpen(true)}
+        onOpenAbout={() => setIsAboutOpen(true)}
       />
 
       <KeyboardShortcutsModal

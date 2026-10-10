@@ -12,6 +12,7 @@ import {
   Server,
   X,
   CornerDownLeft,
+  Info,
 } from "lucide-react";
 import { BucketInfo } from "@/storage/storage.types";
 
@@ -28,6 +29,7 @@ interface CommandPaletteProps {
   onOpenDiagnostics: () => void;
   onOpenAuditLog: () => void;
   onOpenProperties: () => void;
+  onOpenAbout?: () => void;
 }
 
 export function CommandPalette({
@@ -43,6 +45,7 @@ export function CommandPalette({
   onOpenDiagnostics,
   onOpenAuditLog,
   onOpenProperties,
+  onOpenAbout,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -159,6 +162,17 @@ export function CommandPalette({
       icon: Server,
       action: () => {
         onOpenProperties();
+        onClose();
+      },
+    },
+    {
+      type: "action" as const,
+      id: "act-about",
+      title: "About System & Technology Stack",
+      subtitle: "Libraries catalog, zero-RAM architecture, runtime specs (A)",
+      icon: Info,
+      action: () => {
+        if (onOpenAbout) onOpenAbout();
         onClose();
       },
     },

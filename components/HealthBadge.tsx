@@ -68,7 +68,7 @@ export function HealthBadge({ onOpenDiagnostics }: HealthBadgeProps) {
             ? "bg-zinc-900 text-emerald-400 border-zinc-800 hover:border-emerald-500/40"
             : "bg-zinc-900 text-rose-400 border-zinc-800 hover:border-rose-500/40"
         }`}
-        title="Click to view detailed Cluster Telemetry & Latency History"
+        title={`Cluster: ${isHealthy ? "ONLINE" : "OFFLINE"} • Latency: ${health?.latencyMs ?? 0}ms • Engine: AWS SDK v3 / SigV4 • Click for diagnostics`}
       >
         <span
           className={`w-2 h-2 rounded-full ${

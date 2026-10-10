@@ -1,0 +1,66 @@
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: s3_minio_server
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin_secure_password_123}
+      MINIO_SERVER_URL: ${STORAGE_ENDPOINT:-http://127.0.0.1:9000}
+      MINIO_BROWSER_REDIRECT_URL: http://127.0.0.1:9001
+    ports:
+      - "9000:9000" # MinIO S3 API Endpoint
+      - "9001:9001" # MinIO Web Management Console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - s3_network
+
+  minio-init:
+    image: quay.io/minio/mc:latest
+    container_name: s3_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:-minioadmin_secure_password_123}
+      STORAGE_DEFAULT_BUCKETS: ${STORAGE_DEFAULT_BUCKETS:-app-uploads,app-images,app-documents,app-public,app-private,app-backups}
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Configuring MinIO client alias...';
+      /usr/bin/mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      echo 'Creating default buckets idempotently...';
+      IFS=','
+      for b in $$STORAGE_DEFAULT_BUCKETS; do
+        b=$$(echo \$$b | tr -d ' ')
+        if [ -n \"\$$b\" ]; then
+          echo \"Checking/Creating bucket: \$$b\";
+          /usr/bin/mc mb --ignore-existing local/\$$b;
+        fi
+      done;
+      if /usr/bin/mc ls local/app-public > /dev/null 2>&1; then
+        echo 'Configuring public read policy on app-public bucket...';
+        /usr/bin/mc anonymous set download local/app-public || true;
+      fi;
+      echo 'MinIO initialization complete.';
+      exit 0;
+      "
+    networks:
+      - s3_network
+
+volumes:
+  minio_data:
+    name: s3_minio_persistent_data
+    driver: local
+
+networks:
+  s3_network:
+    name: s3_minio_network
+    driver: bridge

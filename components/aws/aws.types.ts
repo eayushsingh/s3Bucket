@@ -81,3 +81,27 @@ export interface AwsCorsRule {
   exposeHeaders?: string[];
   maxAgeSeconds?: number;
 }
+
+export interface AwsLifecycleRule {
+  id: string;
+  status: "Enabled" | "Disabled";
+  prefix: string;
+  transitions: {
+    days: number;
+    storageClass: AwsStorageClass;
+  }[];
+  expirationDays?: number;
+  noncurrentVersionExpirationDays?: number;
+}
+
+export interface AwsBucketMetricsData {
+  bucketSizeSeries: { timestamp: string; bytes: number }[];
+  objectCountSeries: { timestamp: string; count: number }[];
+  requestCount24h: {
+    allRequests: number;
+    getRequests: number;
+    putRequests: number;
+    deleteRequests: number;
+  };
+  latencyMs: number;
+}

@@ -50,3 +50,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Bucket governance panel for Object Versioning, Lifecycle rules, CORS, and IAM policies.
 - Built-in binary hex dump viewer (`xxd` style) and syntax-highlighted code inspector.
 - Multi-language SDK code snippet generator for cURL, AWS CLI, Python boto3, Node.js, and Go.
+
+## [1.3.0] - 2026-10-11
+
+### 🚀 Added
+- Authentic AWS S3 Management Console UI & UX with Cloudscape Dark theme.
+- AWS Global Header bar with Amazon Navy palette (#232f3e) and region selector.
+- S3 6-Tab management architecture: Objects, Properties, Permissions, Metrics, Management, Access Points.
+- S3 Object Action bar with primary orange Upload CTA (#ec7211) and Delete confirmation.
+- Bucket Policy JSON editor, CORS editor, and Lifecycle transition rules.

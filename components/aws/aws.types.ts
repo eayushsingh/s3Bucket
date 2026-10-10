@@ -40,3 +40,29 @@ export interface AwsSelectedObjectSummary {
   totalBytes: number;
   count: number;
 }
+
+export interface AwsBucketProperties {
+  bucket: string;
+  region: string;
+  arn: string;
+  creationDate: string;
+  versioningStatus: "Enabled" | "Suspended" | "Disabled";
+  defaultEncryption: {
+    type: "SSE-S3" | "SSE-KMS";
+    bucketKeyEnabled: boolean;
+    kmsMasterKeyId?: string;
+  };
+  serverAccessLogging: {
+    enabled: boolean;
+    targetBucket?: string;
+    targetPrefix?: string;
+  };
+  staticWebsiteHosting: {
+    enabled: boolean;
+    indexDocument?: string;
+    errorDocument?: string;
+  };
+  transferAcceleration: boolean;
+  objectLock: boolean;
+  tags: Record<string, string>;
+}

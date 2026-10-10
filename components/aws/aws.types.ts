@@ -23,3 +23,20 @@ export interface AwsStorageClassOption {
   durability: string;
   minDurationDays: number;
 }
+
+export interface AwsS3ObjectItem {
+  key: string;
+  name: string;
+  size: number;
+  lastModified: string;
+  storageClass: AwsStorageClass;
+  isFolder: boolean;
+  etag?: string;
+  versionId?: string;
+}
+
+export interface AwsSelectedObjectSummary {
+  keys: string[];
+  totalBytes: number;
+  count: number;
+}

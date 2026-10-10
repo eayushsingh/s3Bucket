@@ -66,3 +66,18 @@ export interface AwsBucketProperties {
   objectLock: boolean;
   tags: Record<string, string>;
 }
+
+export interface AwsBlockPublicAccessSettings {
+  blockPublicAcls: boolean;
+  ignorePublicAcls: boolean;
+  blockPublicPolicy: boolean;
+  restrictPublicBuckets: boolean;
+}
+
+export interface AwsCorsRule {
+  allowedHeaders: string[];
+  allowedMethods: ("GET" | "PUT" | "POST" | "DELETE" | "HEAD")[];
+  allowedOrigins: string[];
+  exposeHeaders?: string[];
+  maxAgeSeconds?: number;
+}

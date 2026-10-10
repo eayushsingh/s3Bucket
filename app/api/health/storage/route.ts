@@ -10,8 +10,21 @@ export async function GET() {
   return NextResponse.json(
     {
       success: health.status === "healthy",
-      data: health,
+      data: {
+        ...health,
+        version: "1.1.0",
+        architecture: "Zero-RAM-Proxy",
+        stackEndpoint: "/api/system/stack",
+      },
     },
-    { status: statusCode }
+    {
+      status: statusCode,
+      headers: {
+        "X-Application-Version": "1.1.0",
+        "X-Storage-Engine": "AWS-SDK-v3/MinIO",
+        "X-Audit-Ledger": "SQLite-WAL",
+        "Cache-Control": "no-store",
+      },
+    }
   );
 }

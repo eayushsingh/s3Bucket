@@ -20,6 +20,7 @@ interface FileUploadModalProps {
   bucket: string;
   currentPrefix: string;
   isOpen: boolean;
+  initialFiles?: File[];
   onClose: () => void;
   onUploadComplete: () => void;
 }
@@ -37,6 +38,7 @@ export function FileUploadModal({
   bucket,
   currentPrefix,
   isOpen,
+  initialFiles,
   onClose,
   onUploadComplete,
 }: FileUploadModalProps) {
@@ -50,6 +52,18 @@ export function FileUploadModal({
   const [newTagVal, setNewTagVal] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (initialFiles && initialFiles.length > 0) {
+      const staged: UploadingFile[] = initialFiles.map((f) => ({
+        id: Math.random().toString(36).substring(7),
+        file: f,
+        progress: 0,
+        status: "idle",
+      }));
+      setFiles((prev) => [...prev, ...staged]);
+    }
+  }, [initialFiles]);
 
   if (!isOpen) return null;
 

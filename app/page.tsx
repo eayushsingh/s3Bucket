@@ -48,6 +48,7 @@ function StorageDashboardContent() {
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(false);
   const [isMetricsOpen, setIsMetricsOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [uploadInitialFiles, setUploadInitialFiles] = useState<File[]>([]);
   const [isMultipartOpen, setIsMultipartOpen] = useState(false);
   const [presignedTargetKey, setPresignedTargetKey] = useState<string | null>(null);
   const [detailTargetKey, setDetailTargetKey] = useState<string | null>(null);
@@ -309,7 +310,14 @@ function StorageDashboardContent() {
             prefixes={prefixes}
             currentPrefix={currentPrefix}
             onNavigatePrefix={(prefix) => setCurrentPrefix(prefix)}
-            onOpenUpload={() => setIsUploadOpen(true)}
+            onOpenUpload={(droppedFiles?: File[]) => {
+              if (droppedFiles && droppedFiles.length > 0) {
+                setUploadInitialFiles(droppedFiles);
+              } else {
+                setUploadInitialFiles([]);
+              }
+              setIsUploadOpen(true);
+            }}
             onOpenMultipart={() => setIsMultipartOpen(true)}
             onInspectObject={(key) => setDetailTargetKey(key)}
             onOpenPresignedModal={(key) => setPresignedTargetKey(key)}
@@ -382,9 +390,14 @@ function StorageDashboardContent() {
           bucket={selectedBucket}
           currentPrefix={currentPrefix}
           isOpen={isUploadOpen}
-          onClose={() => setIsUploadOpen(false)}
+          initialFiles={uploadInitialFiles}
+          onClose={() => {
+            setIsUploadOpen(false);
+            setUploadInitialFiles([]);
+          }}
           onUploadComplete={() => {
             setIsUploadOpen(false);
+            setUploadInitialFiles([]);
             fetchObjects();
           }}
         />

@@ -34,7 +34,7 @@ interface FileExplorerProps {
   prefixes: string[];
   currentPrefix: string;
   onNavigatePrefix: (prefix: string) => void;
-  onOpenUpload: () => void;
+  onOpenUpload: (droppedFiles?: File[]) => void;
   onOpenMultipart: () => void;
   onInspectObject: (key: string) => void;
   onOpenPresignedModal: (key: string) => void;
@@ -65,6 +65,7 @@ export function FileExplorer({
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortAsc, setSortAsc] = useState(true);
   const [copiedUri, setCopiedUri] = useState(false);
+  const [copiedRowKey, setCopiedRowKey] = useState<string | null>(null);
   const [batchStorageClass, setBatchStorageClass] = useState<S3StorageClass>("GLACIER");
 
   // New Folder modal state
@@ -267,7 +268,12 @@ export function FileExplorer({
       onDrop={(e) => {
         e.preventDefault();
         setIsDragging(false);
-        onOpenUpload();
+        const droppedFiles = Array.from(e.dataTransfer.files || []);
+        if (droppedFiles.length > 0) {
+          onOpenUpload(droppedFiles);
+        } else {
+          onOpenUpload();
+        }
       }}
       className={`flex-1 flex flex-col bg-zinc-950 border rounded-lg shadow-xl overflow-hidden min-h-[500px] relative transition-colors ${
         isDragging ? "border-sky-500 bg-sky-950/10" : "border-zinc-800"
@@ -317,7 +323,7 @@ export function FileExplorer({
             <span className="hidden sm:inline">New Folder</span>
           </button>
           <button
-            onClick={onOpenUpload}
+            onClick={() => onOpenUpload()}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-xs font-medium border border-zinc-700/80 transition"
           >
             <Upload className="w-3.5 h-3.5" />
@@ -511,6 +517,23 @@ export function FileExplorer({
                     </td>
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => {
+                            const uri = `s3://${bucket}/${obj.key}`;
+                            navigator.clipboard.writeText(uri);
+                            setCopiedRowKey(obj.key);
+                            setTimeout(() => setCopiedRowKey(null), 1500);
+                            success("Copied S3 URI", uri);
+                          }}
+                          className="p-1 text-zinc-500 hover:text-zinc-200 rounded transition"
+                          title="Copy S3 URI (s3://...)"
+                        >
+                          {copiedRowKey === obj.key ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
                         <button
                           onClick={() => handleDownloadObject(obj.key)}
                           className="p-1 text-zinc-500 hover:text-emerald-400 rounded transition"

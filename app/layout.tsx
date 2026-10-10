@@ -14,10 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
-        <div className="fixed inset-0 glow-gradient pointer-events-none z-0" />
+      <body className="bg-zinc-950 text-zinc-100 antialiased selection:bg-sky-500/30 selection:text-sky-200">
         <main className="relative z-10 min-h-screen flex flex-col">{children}</main>
       </body>
     </html>
   );
 }
+

@@ -175,3 +175,23 @@ code, pre, .font-mono {
 .aws-table-row.selected {
   background-color: rgba(236, 114, 17, 0.12);
 }
+
+/* AWS Callout Banner Styles */
+.aws-callout-info {
+  background: rgba(30, 41, 59, 0.7);
+  border-left: 4px solid #38bdf8;
+  padding: 0.75rem 1rem;
+  border-radius: 0 4px 4px 0;
+}
+.aws-callout-warning {
+  background: rgba(120, 53, 15, 0.25);
+  border-left: 4px solid #f59e0b;
+  padding: 0.75rem 1rem;
+  border-radius: 0 4px 4px 0;
+}
+.aws-callout-danger {
+  background: rgba(136, 19, 55, 0.25);
+  border-left: 4px solid #f43f5e;
+  padding: 0.75rem 1rem;
+  border-radius: 0 4px 4px 0;
+}

@@ -49,3 +49,36 @@ export const AWS_STORAGE_CLASSES: AwsStorageClassOption[] = [
     minDurationDays: 180,
   },
 ];
+
+export function getDefaultBucketPolicy(bucketName: string): string {
+  return JSON.stringify(
+    {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Sid: "PublicReadGetObject",
+          Effect: "Allow",
+          Principal: "*",
+          Action: ["s3:GetObject"],
+          Resource: [`arn:aws:s3:::${bucketName}/*`],
+        },
+      ],
+    },
+    null,
+    2
+  );
+}
+
+export const DEFAULT_CORS_CONFIG = JSON.stringify(
+  [
+    {
+      AllowedHeaders: ["*"],
+      AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
+      AllowedOrigins: ["*"],
+      ExposeHeaders: ["ETag", "x-amz-server-side-encryption"],
+      MaxAgeSeconds: 3600,
+    },
+  ],
+  null,
+  2
+);

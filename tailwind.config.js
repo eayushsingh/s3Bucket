@@ -7,6 +7,18 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+        colors: {
+          aws: {
+            header: '#232f3e',
+            headerBorder: '#161e2e',
+            orange: '#ec7211',
+            orangeHover: '#eb5f07',
+            darkBg: '#0f172a',
+            card: '#1e293b',
+            border: '#334155',
+            textMuted: '#94a3b8'
+          }
+        },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

@@ -263,3 +263,7 @@ npm run test:watch
 ## 📄 License
 
 This project is open-source and licensed under the [MIT License](LICENSE).
+
+## 🎛️ AWS S3 Management Console UI
+
+The console replicates the official **Amazon S3 Management Console** using AWS Cloudscape Dark design tokens, global header navigation, and all 6 core bucket administration tabs: Objects, Properties, Permissions, Metrics, Management, and Access Points.

@@ -125,3 +125,16 @@ code, pre, .font-mono {
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
+
+/* AWS Cloudscape Dark Palette Variables */
+:root {
+  --aws-header-bg: #232f3e;
+  --aws-header-border: #161e2e;
+  --aws-orange-primary: #ec7211;
+  --aws-orange-hover: #eb5f07;
+  --aws-dark-bg: #0f172a;
+  --aws-card-bg: #1e293b;
+  --aws-border: #334155;
+  --aws-text-primary: #f8fafc;
+  --aws-text-secondary: #94a3b8;
+}

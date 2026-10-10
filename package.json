@@ -1,0 +1,58 @@
+{
+  "name": "s3-minio-storage-system",
+  "version": "1.1.0",
+  "description": "Production-ready S3-compatible Object Storage management platform powered by Next.js 14, MinIO, TypeScript, and AWS SDK v3.",
+  "main": "index.js",
+  "author": "Ayush Singh <ayushhsinghhe01@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eayushsingh/s3Bucket.git"
+  },
+  "keywords": [
+    "s3",
+    "minio",
+    "object-storage",
+    "nextjs",
+    "typescript",
+    "aws-sdk",
+    "presigned-urls",
+    "multipart-upload",
+    "cloud-storage",
+    "self-hosted"
+  ],
+  "scripts": {
+    "dev": "tsx scripts/start-minio.ts && next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "storage:start": "tsx scripts/start-minio.ts",
+    "init:storage": "tsx scripts/init-storage.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/s3-request-presigner": "^3.758.0",
+    "better-sqlite3": "^11.8.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "next": "^14.2.24",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^20.17.19",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}

@@ -87,7 +87,7 @@ export default function AboutPage() {
                 System Overview & Technology Stack
               </h1>
               <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800 uppercase">
-                v1.1.0-PROD
+                v1.2.0-PROD
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 font-mono mt-0.5">

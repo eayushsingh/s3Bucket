@@ -39,7 +39,7 @@ export async function GET() {
   const responsePayload = {
     application: {
       name: "AWS S3 / MinIO Storage Console",
-      version: "1.1.0",
+      version: "1.2.0",
       license: "MIT",
       architecture: "Next.js 14 App Router + Zero-RAM Direct Streaming Proxy",
     },

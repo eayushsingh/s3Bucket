@@ -12,7 +12,7 @@ export async function GET() {
       success: health.status === "healthy",
       data: {
         ...health,
-        version: "1.1.0",
+        version: "1.2.0",
         architecture: "Zero-RAM-Proxy",
         stackEndpoint: "/api/system/stack",
       },
@@ -20,7 +20,7 @@ export async function GET() {
     {
       status: statusCode,
       headers: {
-        "X-Application-Version": "1.1.0",
+        "X-Application-Version": "1.2.0",
         "X-Storage-Engine": "AWS-SDK-v3/MinIO",
         "X-Audit-Ledger": "SQLite-WAL",
         "Cache-Control": "no-store",

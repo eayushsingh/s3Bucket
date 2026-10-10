@@ -200,7 +200,7 @@ function StorageDashboardContent() {
                 AWS S3 / MinIO Storage Console
               </h1>
               <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-zinc-900 text-zinc-400 border border-zinc-800 uppercase">
-                v1.1.0-PROD
+                v1.2.0-PROD
               </span>
             </div>
             <p className="text-[11px] text-zinc-500 font-mono mt-0.5">

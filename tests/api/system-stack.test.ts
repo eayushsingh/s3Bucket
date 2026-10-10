@@ -12,7 +12,7 @@ describe("System Stack API Handler (/api/system/stack)", () => {
 
     // Application details
     expect(body.data.application.name).toContain("AWS S3");
-    expect(body.data.application.version).toBe("1.1.0");
+    expect(body.data.application.version).toBe("1.2.0");
 
     // Libraries & categories
     expect(Array.isArray(body.data.libraries)).toBe(true);

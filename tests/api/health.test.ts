@@ -8,11 +8,11 @@ describe("Health Route API Handler (/api/health/storage)", () => {
 
     const body = await response.json();
     expect(body.data).toBeDefined();
-    expect(body.data.version).toBe("1.1.0");
+    expect(body.data.version).toBe("1.2.0");
     expect(body.data.architecture).toBe("Zero-RAM-Proxy");
     expect(body.data.stackEndpoint).toBe("/api/system/stack");
 
-    expect(response.headers.get("X-Application-Version")).toBe("1.1.0");
+    expect(response.headers.get("X-Application-Version")).toBe("1.2.0");
     expect(response.headers.get("X-Storage-Engine")).toBe("AWS-SDK-v3/MinIO");
     expect(response.headers.get("X-Audit-Ledger")).toBe("SQLite-WAL");
   });

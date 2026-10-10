@@ -117,7 +117,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   About AWS S3 / MinIO Storage Console
                 </h2>
                 <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800 uppercase">
-                  v1.1.0-PROD
+                  v1.2.0-PROD
                 </span>
               </div>
               <p className="text-xs text-zinc-400 mt-0.5">

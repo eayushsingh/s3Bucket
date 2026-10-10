@@ -208,6 +208,35 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## 📚 Technology Stack & Library Rationale (About the Engine)
+
+Every dependency in `s3Bucket` was carefully selected to satisfy high-throughput cloud storage constraints, zero-RAM proxying, strict type safety, and real-time operational visibility:
+
+| Package | Version | Architectural Role | Why Selected |
+|---|---|---|---|
+| **Next.js** | `^14.2.24` | Full-stack application engine & route handlers | Provides zero-RAM proxying via streaming route handlers, production-grade bundling, and server execution without needing detached API instances. |
+| **React & React-DOM** | `^18.3.1` | Reactive UI and concurrent rendering | Powers concurrent UI updates, real-time file exploration, upload queues, and modal dialogs with optimal re-render cycles. |
+| **@aws-sdk/client-s3** | `^3.758.0` | Modular S3 protocol engine | Modular AWS SDK v3 client (~2MB) replaces legacy monolithic SDK v2 (~70MB). Supports tree-shaking, native TypeScript typings, and multipart uploads. |
+| **@aws-sdk/s3-request-presigner** | `^3.758.0` | SigV4 cryptographic signature generator | Generates time-limited HMAC-SHA256 presigned URLs, offloading multi-GB file transfers directly from browser to MinIO without touching Node.js server RAM. |
+| **better-sqlite3** | `^11.8.1` | Synchronous WAL operational audit ledger | C-backed synchronous SQLite binding avoiding promise churn. Operates in Write-Ahead Logging (WAL) mode for microsecond audit logging without external databases. |
+| **zod** | `^3.24.2` | Runtime validation & defensive security | Eliminates duplicate typings by deriving TypeScript types directly from runtime schemas. Enforces S3 bucket DNS RFC-1123 rules and path traversal defense. |
+| **lucide-react** | `^0.475.0` | Industrial icon system | Lightweight, tree-shakeable SVG glyphs providing clear visual indicators for storage classes, cluster status, and navigation. |
+| **Tailwind CSS** | `^3.4.17` | Utility styling & industrial tokens | JIT-compiled zero-runtime CSS with custom high-density dark mode palette (zinc/sky/emerald) tailored for system consoles. |
+| **clsx & tailwind-merge** | `^2.1.1` / `^3.0.1` | Safe utility class composition | Prevents CSS specificity collisions when dynamically composing component styling variants. |
+| **Vitest** | `^3.0.5` | Vite-native unit test runner | Native ESM and TypeScript test runner executing 48+ test specs in sub-second durations. |
+| **tsx** | `^4.19.3` | TypeScript CLI script execution | Instant script executor powered by esbuild for storage bootstrap and seed routines (`scripts/start-minio.ts`). |
+| **TypeScript** | `^5.7.3` | End-to-end static type verification | Enforces strict compile-time type safety across AWS SDK v3 commands, route handlers, and UI props. |
+| **MinIO** | `RELEASE.2024-05-10+` | S3 API-compatible object storage server | Industry standard high-performance distributed object server with 100% S3 compatibility, local disk persistence, and admin console. |
+| **Docker Compose** | `v2.x Compose Spec` | Container orchestration | Declarative multi-container configuration guaranteeing reproducible environments across macOS, Linux, and Windows. |
+
+### Architectural Guarantees
+1. **Zero-RAM Web Proxying**: Large uploads stream directly between browser and MinIO via SigV4 URLs. The web server never holds multipart binaries in memory.
+2. **Modular AWS SDK v3**: Only the necessary S3 client commands are bundled, keeping server bundle sizes under 3MB.
+3. **Synchronous WAL Auditability**: Every bucket or object action is synchronously journaled in `better-sqlite3` before HTTP response completion.
+4. **Interactive In-App About Console**: Access the live interactive technology stack and architecture blueprint in the application by pressing `A` or navigating to `/about`.
+
+---
+
 ## 🧪 Testing
 
 Run unit and integration tests using Vitest:

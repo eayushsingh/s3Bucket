@@ -163,3 +163,15 @@ code, pre, .font-mono {
   background-color: #334155;
   border-color: #64748b;
 }
+
+/* AWS High-density Table Utilities */
+.aws-table-row {
+  border-bottom: 1px solid #334155;
+  transition: background-color 0.1s ease;
+}
+.aws-table-row:hover {
+  background-color: rgba(51, 65, 85, 0.4);
+}
+.aws-table-row.selected {
+  background-color: rgba(236, 114, 17, 0.12);
+}

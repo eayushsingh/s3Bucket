@@ -20,6 +20,7 @@ export function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShortcutsMod
     { key: "l", description: "Open S3 Live Audit Trail" },
     { key: "d", description: "Open System Diagnostics Probe" },
     { key: "p", description: "Open Bucket Configuration & Policies" },
+    { key: "a", description: "Open About System & Technology Stack" },
     { key: "?", description: "Toggle this Keyboard Shortcuts legend" },
     { key: "Esc", description: "Close any modal, drawer, or dialog" },
   ];

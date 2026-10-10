@@ -142,6 +142,9 @@ function StorageDashboardContent() {
       } else if (e.key === "m" || e.key === "M") {
         e.preventDefault();
         if (selectedBucket) setIsMultipartOpen(true);
+      } else if (e.key === "a" || e.key === "A") {
+        e.preventDefault();
+        setIsAboutOpen((prev) => !prev);
       }
     };
 

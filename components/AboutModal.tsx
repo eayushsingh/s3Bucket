@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   X,
   Layers,
@@ -381,12 +382,23 @@ export const AboutModal: React.FC<AboutModalProps> = ({
             <Code2 className="w-3.5 h-3.5 text-zinc-400" />
             <span className="hidden sm:inline">Engineered for AWS S3 & MinIO Object Storage</span>
           </div>
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition"
-          >
-            Close Overview
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/about"
+              onClick={onClose}
+              className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-sky-400 border border-zinc-800 hover:border-sky-500/50 transition flex items-center gap-1.5"
+              title="Open full page view at /about"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Full Page Dossier</span>
+            </Link>
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 transition"
+            >
+              Close Overview
+            </button>
+          </div>
         </div>
       </div>
     </div>

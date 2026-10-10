@@ -11,3 +11,41 @@ export const AWS_REGIONS: AwsRegionInfo[] = [
   { id: "ap-south-1", name: "Asia Pacific (Mumbai)", location: "Asia Pacific" },
   { id: "local-minio", name: "Local MinIO Cluster", location: "On-Premises" },
 ];
+
+export const AWS_STORAGE_CLASSES: AwsStorageClassOption[] = [
+  {
+    value: "STANDARD",
+    label: "Standard",
+    description: "Frequently accessed data with low latency and high throughput performance.",
+    durability: "99.999999999% (11 9s)",
+    minDurationDays: 0,
+  },
+  {
+    value: "INTELLIGENT_TIERING",
+    label: "Intelligent-Tiering",
+    description: "Automatic cost savings by moving data across access tiers based on usage.",
+    durability: "99.999999999% (11 9s)",
+    minDurationDays: 0,
+  },
+  {
+    value: "STANDARD_IA",
+    label: "Standard-IA",
+    description: "Infrequently accessed data requiring rapid access when needed.",
+    durability: "99.999999999% (11 9s)",
+    minDurationDays: 30,
+  },
+  {
+    value: "GLACIER",
+    label: "Glacier Flexible Retrieval",
+    description: "Low-cost archival storage with configurable retrieval from minutes to hours.",
+    durability: "99.999999999% (11 9s)",
+    minDurationDays: 90,
+  },
+  {
+    value: "DEEP_ARCHIVE",
+    label: "Glacier Deep Archive",
+    description: "Lowest-cost storage class designed for long-term retention and compliance.",
+    durability: "99.999999999% (11 9s)",
+    minDurationDays: 180,
+  },
+];

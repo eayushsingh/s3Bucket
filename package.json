@@ -1,6 +1,6 @@
 {
   "name": "s3-minio-storage-system",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Production-ready S3-compatible Object Storage management platform powered by Next.js 14, MinIO, TypeScript, and AWS SDK v3.",
   "main": "index.js",
   "author": "Ayush Singh <ayushhsinghhe01@gmail.com>",

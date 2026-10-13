@@ -22,13 +22,17 @@
     "self-hosted"
   ],
   "scripts": {
-    "dev": "tsx scripts/start-minio.ts && next dev",
+    "predev": "tsx scripts/start-minio.ts",
+    "dev": "next dev",
     "build": "next build",
+    "prestart": "tsx scripts/start-minio.ts",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
     "storage:start": "tsx scripts/start-minio.ts",
+    "storage:health": "tsx scripts/check-storage-health.ts",
+    "storage:watchdog": "tsx scripts/supervisor-daemon.ts",
     "init:storage": "tsx scripts/init-storage.ts"
   },
   "dependencies": {

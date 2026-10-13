@@ -51,21 +51,29 @@ export function BucketManager({
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanName = newBucketName.trim().toLowerCase();
     setCreating(true);
 
     try {
       const res = await fetch("/api/storage/buckets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bucketName: newBucketName.trim().toLowerCase() }),
+        body: JSON.stringify({ bucketName: cleanName }),
       });
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error?.message || "Failed to create bucket");
+        // If connection refused, prompt user that self-healing is active
+        const msg = data.error?.message || "Failed to create bucket";
+        if (msg.includes("ECONNREFUSED") || msg.includes("Failed to connect")) {
+          throw new Error(
+            "MinIO storage daemon was reconnecting. Background self-healing is recovering the service. Please try again in a moment."
+          );
+        }
+        throw new Error(msg);
       }
 
-      success("Bucket Created", `Namespace s3://${newBucketName.trim().toLowerCase()} is active`);
+      success("Bucket Created", `Namespace s3://${cleanName} is active`);
       setNewBucketName("");
       setIsCreateOpen(false);
       onBucketCreated();

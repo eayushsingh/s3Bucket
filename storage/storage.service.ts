@@ -63,6 +63,8 @@ import {
   MultipartUploadError,
 } from "./storage.errors";
 import { validateBucketName, validateObjectKey } from "./sanitizer";
+import { executeWithResilience, isConnectionRefusalError } from "./storage-resilience";
+import { embeddedStorageEngine } from "./embedded-storage.engine";
 
 export class StorageService {
   private client: S3Client;
@@ -71,6 +73,11 @@ export class StorageService {
   constructor(customClient?: S3Client) {
     this.client = customClient || getS3Client();
   }
+
+  private get s3(): S3Client {
+    return getS3Client();
+  }
+
 
   /**
    * Helper to map AWS/MinIO errors to domain-specific StorageErrors
@@ -169,23 +176,35 @@ export class StorageService {
    */
   async createBucket(bucketName: string): Promise<{ created: boolean; name: string }> {
     validateBucketName(bucketName);
-    const exists = await this.bucketExists(bucketName);
-    if (exists) {
-      return { created: false, name: bucketName };
-    }
 
-    try {
-      const command = new CreateBucketCommand({
-        Bucket: bucketName,
-      });
-      await this.client.send(command);
-      return { created: true, name: bucketName };
-    } catch (err: any) {
-      if (err.name === "BucketAlreadyExists" || err.name === "BucketAlreadyOwnedByYou") {
-        return { created: false, name: bucketName };
+    return executeWithResilience(
+      async () => {
+        const exists = await this.bucketExists(bucketName);
+        if (exists) {
+          return { created: false, name: bucketName };
+        }
+
+        try {
+          const command = new CreateBucketCommand({
+            Bucket: bucketName,
+          });
+          await this.s3.send(command);
+          return { created: true, name: bucketName };
+        } catch (err: any) {
+          if (err.name === "BucketAlreadyExists" || err.name === "BucketAlreadyOwnedByYou") {
+            return { created: false, name: bucketName };
+          }
+          return this.handleError(err, bucketName);
+        }
+      },
+      { operationName: `createBucket(${bucketName})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        console.warn(`[Storage Fallback] MinIO unavailable. Creating bucket '${bucketName}' in embedded storage.`);
+        return await embeddedStorageEngine.createBucket(bucketName);
       }
-      return this.handleError(err, bucketName);
-    }
+      throw err;
+    });
   }
 
   /**

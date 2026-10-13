@@ -258,6 +258,10 @@ export function BucketManager({
                 <span className="text-[10px] text-zinc-500 mt-1 block">
                   3-63 characters, lowercase letters, numbers, and hyphens.
                 </span>
+                <div className="mt-2.5 p-2 rounded bg-zinc-900/60 border border-zinc-800 text-[10px] text-zinc-400 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0" />
+                  <span>Autonomous recovery active: connection auto-heals without downtime.</span>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">

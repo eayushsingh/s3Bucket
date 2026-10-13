@@ -40,5 +40,15 @@ export class EmbeddedStorageEngine {
   private getObjectMetaPath(bucket: string, key: string): string {
     return path.join(this.getBucketPath(bucket), `${key}.meta.json`);
   }
+
+  /**
+   * Checks whether a bucket directory exists on disk.
+   */
+  async bucketExists(bucketName: string): Promise<boolean> {
+    validateBucketName(bucketName);
+    const bPath = this.getBucketPath(bucketName);
+    return fs.existsSync(bPath) && fs.statSync(bPath).isDirectory();
+  }
 }
+
 

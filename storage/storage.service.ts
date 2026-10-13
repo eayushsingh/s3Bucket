@@ -582,23 +582,49 @@ export class StorageService {
     validateBucketName(bucketName);
     const cleanKey = validateObjectKey(objectKey);
 
-    try {
-      const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: cleanKey,
-        Body: body as any,
-        ContentType: contentType,
-        Metadata: metadata,
-      });
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new PutObjectCommand({
+            Bucket: bucketName,
+            Key: cleanKey,
+            Body: body as any,
+            ContentType: contentType,
+            Metadata: metadata,
+          });
 
-      const response = await this.client.send(command);
-      return {
-        key: cleanKey,
-        etag: response.ETag ? response.ETag.replace(/"/g, "") : undefined,
-      };
-    } catch (err) {
-      return this.handleError(err, bucketName, cleanKey);
-    }
+          const response = await this.s3.send(command);
+          return {
+            key: cleanKey,
+            etag: response.ETag ? response.ETag.replace(/"/g, "") : undefined,
+          };
+        } catch (err) {
+          return this.handleError(err, bucketName, cleanKey);
+        }
+      },
+      { operationName: `uploadObject(${bucketName}/${cleanKey})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        console.warn(`[Storage Fallback] MinIO unavailable. Storing '${cleanKey}' in embedded storage.`);
+        const buffer = Buffer.isBuffer(body)
+          ? body
+          : typeof body === "string"
+          ? Buffer.from(body)
+          : Buffer.from([]);
+        const local = await embeddedStorageEngine.putObject({
+          bucket: bucketName,
+          key: cleanKey,
+          body: buffer,
+          contentType,
+          metadata,
+        });
+        return {
+          key: local.key,
+          etag: local.etag,
+        };
+      }
+      throw err;
+    });
   }
 
   /**

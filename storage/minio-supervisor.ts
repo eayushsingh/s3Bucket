@@ -103,3 +103,24 @@ async function performMinIOAutoRecovery(): Promise<{
   return { ready: false, mode: "unreachable", message: lastSupervisorStatus.message };
 }
 
+/**
+ * Main public entry point to ensure the MinIO storage engine is running.
+ * Coalesces concurrent calls to prevent multiple processes being launched.
+ */
+export async function ensureMinIOEngineRunning(): Promise<{
+  ready: boolean;
+  mode: StorageEngineMode;
+  message: string;
+}> {
+  if (activeRecoveryPromise) {
+    return activeRecoveryPromise;
+  }
+
+  activeRecoveryPromise = performMinIOAutoRecovery().finally(() => {
+    activeRecoveryPromise = null;
+  });
+
+  return activeRecoveryPromise;
+}
+
+

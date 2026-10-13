@@ -278,37 +278,58 @@ export class StorageService {
   async listObjects(bucketName: string, options: ListObjectsOptions = {}): Promise<ListObjectsResult> {
     validateBucketName(bucketName);
 
-    try {
-      const command = new ListObjectsV2Command({
-        Bucket: bucketName,
-        Prefix: options.prefix || undefined,
-        Delimiter: options.delimiter || undefined,
-        MaxKeys: options.maxKeys || 1000,
-        ContinuationToken: options.continuationToken || undefined,
-      });
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new ListObjectsV2Command({
+            Bucket: bucketName,
+            Prefix: options.prefix || undefined,
+            Delimiter: options.delimiter || undefined,
+            MaxKeys: options.maxKeys || 1000,
+            ContinuationToken: options.continuationToken || undefined,
+          });
 
-      const response = await this.client.send(command);
+          const response = await this.s3.send(command);
 
-      const objects: ObjectMetadata[] = (response.Contents || []).map((item) => ({
-        key: item.Key || "",
-        size: item.Size || 0,
-        lastModified: item.LastModified,
-        etag: item.ETag ? item.ETag.replace(/"/g, "") : undefined,
-      }));
+          const objects: ObjectMetadata[] = (response.Contents || []).map((item) => ({
+            key: item.Key || "",
+            size: item.Size || 0,
+            lastModified: item.LastModified,
+            etag: item.ETag ? item.ETag.replace(/"/g, "") : undefined,
+          }));
 
-      const prefixes: string[] = (response.CommonPrefixes || []).map(
-        (p) => p.Prefix || ""
-      );
+          const prefixes: string[] = (response.CommonPrefixes || []).map(
+            (p) => p.Prefix || ""
+          );
 
-      return {
-        objects,
-        prefixes,
-        isTruncated: !!response.IsTruncated,
-        nextContinuationToken: response.NextContinuationToken,
-      };
-    } catch (err) {
-      return this.handleError(err, bucketName);
-    }
+          return {
+            objects,
+            prefixes,
+            isTruncated: !!response.IsTruncated,
+            nextContinuationToken: response.NextContinuationToken,
+          };
+        } catch (err) {
+          return this.handleError(err, bucketName);
+        }
+      },
+      { operationName: `listObjects(${bucketName})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        console.warn(`[Storage Fallback] MinIO unavailable. Listing objects for '${bucketName}' from embedded storage.`);
+        const local = await embeddedStorageEngine.listObjects(bucketName, options);
+        return {
+          objects: local.objects.map((o) => ({
+            key: o.key,
+            size: o.size,
+            lastModified: o.lastModified,
+            etag: o.etag,
+          })),
+          prefixes: local.prefixes,
+          isTruncated: false,
+        };
+      }
+      throw err;
+    });
   }
 
   /**

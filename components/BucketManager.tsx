@@ -117,6 +117,10 @@ export function BucketManager({
           <h3 className="text-xs font-bold text-zinc-100 uppercase tracking-wider font-mono">
             S3 Namespaces ({buckets.length})
           </h3>
+          <span className="flex items-center gap-1 text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/60" title="Self-Healing MinIO Engine Active">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Live
+          </span>
         </div>
         <button
           onClick={() => setIsCreateOpen(true)}

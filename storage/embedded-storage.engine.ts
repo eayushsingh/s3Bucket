@@ -245,7 +245,81 @@ export class EmbeddedStorageEngine {
       prefixes: Array.from(prefixes),
     };
   }
+
+  /**
+   * Retrieves an object body and metadata from the local store.
+   */
+  async getObject(
+    bucket: string,
+    key: string
+  ): Promise<{
+    body: Buffer;
+    contentType: string;
+    contentLength: number;
+    etag?: string;
+    lastModified?: Date;
+    metadata?: Record<string, string>;
+  }> {
+    validateBucketName(bucket);
+    if (!(await this.bucketExists(bucket))) {
+      throw new BucketNotFoundError(bucket);
+    }
+
+    const objPath = this.getObjectPath(bucket, key);
+    if (!fs.existsSync(objPath) || fs.statSync(objPath).isDirectory()) {
+      throw new ObjectNotFoundError(bucket, key);
+    }
+
+    const stat = fs.statSync(objPath);
+    const body = fs.readFileSync(objPath);
+    let contentType = "application/octet-stream";
+    let etag: string | undefined;
+    let metadata: Record<string, string> | undefined;
+
+    const metaPath = this.getObjectMetaPath(bucket, key);
+    if (fs.existsSync(metaPath)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+        contentType = raw.contentType || contentType;
+        etag = raw.etag;
+        metadata = raw.metadata;
+      } catch {
+        // Fallback
+      }
+    }
+
+    return {
+      body,
+      contentType,
+      contentLength: stat.size,
+      etag,
+      lastModified: stat.mtime,
+      metadata,
+    };
+  }
+
+  /**
+   * Reads metadata headers for an object.
+   */
+  async headObject(
+    bucket: string,
+    key: string
+  ): Promise<{
+    contentLength: number;
+    contentType: string;
+    etag?: string;
+    lastModified?: Date;
+  }> {
+    const res = await this.getObject(bucket, key);
+    return {
+      contentLength: res.contentLength,
+      contentType: res.contentType,
+      etag: res.etag,
+      lastModified: res.lastModified,
+    };
+  }
 }
+
 
 
 

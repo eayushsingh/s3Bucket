@@ -28,4 +28,17 @@ export class EmbeddedStorageEngine {
   private getBucketPath(bucket: string): string {
     return path.join(this.baseDir, bucket);
   }
+
+  private getBucketMetaPath(bucket: string): string {
+    return path.join(this.baseDir, `${bucket}.bucket-meta.json`);
+  }
+
+  private getObjectPath(bucket: string, key: string): string {
+    return path.join(this.getBucketPath(bucket), key);
+  }
+
+  private getObjectMetaPath(bucket: string, key: string): string {
+    return path.join(this.getBucketPath(bucket), `${key}.meta.json`);
+  }
 }
+

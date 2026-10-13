@@ -345,7 +345,20 @@ export class EmbeddedStorageEngine {
     }
     return deleted;
   }
+
+  /**
+   * Calculates total object count and byte size for an embedded bucket.
+   */
+  async getBucketMetrics(bucket: string): Promise<{ objectCount: number; totalSizeBytes: number }> {
+    const list = await this.listObjects(bucket);
+    const totalSizeBytes = list.objects.reduce((sum, o) => sum + o.size, 0);
+    return {
+      objectCount: list.objects.length,
+      totalSizeBytes,
+    };
+  }
 }
+
 
 
 

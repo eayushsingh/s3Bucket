@@ -179,7 +179,74 @@ export class EmbeddedStorageEngine {
       size: buffer.length,
     };
   }
+
+  /**
+   * Lists objects within an embedded bucket matching optional prefix and delimiter.
+   */
+  async listObjects(
+    bucket: string,
+    options: { prefix?: string; delimiter?: string } = {}
+  ): Promise<{
+    objects: { key: string; size: number; lastModified?: Date; etag?: string }[];
+    prefixes: string[];
+  }> {
+    validateBucketName(bucket);
+    if (!(await this.bucketExists(bucket))) {
+      throw new BucketNotFoundError(bucket);
+    }
+
+    const bPath = this.getBucketPath(bucket);
+    const objects: { key: string; size: number; lastModified?: Date; etag?: string }[] = [];
+    const prefixes = new Set<string>();
+
+    const scan = (dir: string, currentPrefix: string) => {
+      const items = fs.readdirSync(dir, { withFileTypes: true });
+      for (const item of items) {
+        if (item.name.endsWith(".meta.json") || item.name.startsWith(".")) continue;
+
+        const relPath = currentPrefix ? `${currentPrefix}/${item.name}` : item.name;
+
+        if (item.isDirectory()) {
+          if (options.delimiter) {
+            prefixes.add(`${relPath}/`);
+          } else {
+            scan(path.join(dir, item.name), relPath);
+          }
+        } else {
+          if (!options.prefix || relPath.startsWith(options.prefix)) {
+            const stat = fs.statSync(path.join(dir, item.name));
+            const metaPath = this.getObjectMetaPath(bucket, relPath);
+            let etag: string | undefined;
+
+            if (fs.existsSync(metaPath)) {
+              try {
+                const meta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+                etag = meta.etag;
+              } catch {
+                // Ignore corrupted sidecar
+              }
+            }
+
+            objects.push({
+              key: relPath,
+              size: stat.size,
+              lastModified: stat.mtime,
+              etag,
+            });
+          }
+        }
+      }
+    };
+
+    scan(bPath, "");
+
+    return {
+      objects,
+      prefixes: Array.from(prefixes),
+    };
+  }
 }
+
 
 
 

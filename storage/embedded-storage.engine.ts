@@ -359,6 +359,9 @@ export class EmbeddedStorageEngine {
   }
 }
 
+export const embeddedStorageEngine = new EmbeddedStorageEngine();
+
+
 
 
 

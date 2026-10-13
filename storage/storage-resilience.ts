@@ -47,3 +47,21 @@ export const recoveryMetrics: RecoveryMetrics = {
   fallbacksTriggered: 0,
 };
 
+/**
+ * Attempts recovery by requesting the MinIO supervisor to spawn/verify the engine.
+ */
+export async function attemptSupervisorRecovery(): Promise<boolean> {
+  const { ensureMinIOEngineRunning } = await import("./minio-supervisor");
+  const { resetS3Client } = await import("./minio.client");
+
+  recoveryMetrics.totalAttempts++;
+  const result = await ensureMinIOEngineRunning();
+  if (result.ready) {
+    resetS3Client();
+    recoveryMetrics.successfulRecoveries++;
+    return true;
+  }
+  return false;
+}
+
+

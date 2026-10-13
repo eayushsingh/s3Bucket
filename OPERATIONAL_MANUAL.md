@@ -95,7 +95,22 @@ curl -X PUT "http://localhost:9000/app-uploads/dump.tar.gz?X-Amz-Signature=..." 
 
 ---
 
-## 6. Disaster Recovery & Backup Strategy
-
 1. **Volume Snapshots**: MinIO stores raw blocks under `/data`. Daily NVMe/EBS snapshot backups provide zero-downtime point-in-time recovery.
 2. **Replication**: Configure continuous asynchronous cluster-to-cluster replication using `mc replicate add local/app-uploads remote/app-uploads`.
+
+---
+
+## 7. High-Availability Storage Supervisor Runbook
+
+### Incident: MinIO Socket Connection Refusal (ECONNREFUSED)
+- **Automatic Behavior**: Storage service detects `isConnectionRefusalError`, engages `storage/minio-supervisor.ts`, checks candidate paths (`/opt/homebrew/bin/minio`, `/usr/local/bin/minio`), starts the engine, destroys stale client connections, and replays the original request.
+- **Fail-Safe Fallback**: If MinIO cannot start, operations transparently fulfill via `EmbeddedStorageEngine` in `minio_data/`.
+- **Manual Verification Commands**:
+  ```bash
+  # Check ports, health live endpoint and daemon
+  npm run storage:health
+
+  # Check listening ports on host
+  lsof -i :9000
+  ```
+

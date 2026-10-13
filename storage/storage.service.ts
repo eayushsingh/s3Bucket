@@ -250,12 +250,22 @@ export class StorageService {
       }
     }
 
-    try {
-      const command = new DeleteBucketCommand({ Bucket: bucketName });
-      await this.client.send(command);
-    } catch (err) {
-      this.handleError(err, bucketName);
-    }
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new DeleteBucketCommand({ Bucket: bucketName });
+          await this.s3.send(command);
+        } catch (err) {
+          this.handleError(err, bucketName);
+        }
+      },
+      { operationName: `deleteBucket(${bucketName})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        return await embeddedStorageEngine.deleteBucket(bucketName, force);
+      }
+      throw err;
+    });
   }
 
   // ============================================================================

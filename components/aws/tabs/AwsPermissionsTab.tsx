@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShieldAlert, ShieldCheck, FileText, CheckCircle2, Lock } from "lucide-react";
+import { ShieldAlert, ShieldCheck, FileText, CheckCircle2, Lock, Globe } from "lucide-react";
 import { getDefaultBucketPolicy, DEFAULT_CORS_CONFIG } from "../aws.constants";
 
 interface AwsPermissionsTabProps {

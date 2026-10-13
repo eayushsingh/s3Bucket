@@ -637,23 +637,41 @@ export class StorageService {
     validateBucketName(bucketName);
     const cleanKey = validateObjectKey(objectKey);
 
-    try {
-      const command = new GetObjectCommand({
-        Bucket: bucketName,
-        Key: cleanKey,
-      });
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new GetObjectCommand({
+            Bucket: bucketName,
+            Key: cleanKey,
+          });
 
-      const response = await this.client.send(command);
+          const response = await this.s3.send(command);
 
-      return {
-        stream: response.Body as Readable,
-        contentType: response.ContentType,
-        contentLength: response.ContentLength,
-        etag: response.ETag ? response.ETag.replace(/"/g, "") : undefined,
-      };
-    } catch (err) {
-      return this.handleError(err, bucketName, cleanKey);
-    }
+          return {
+            stream: response.Body as Readable,
+            contentType: response.ContentType,
+            contentLength: response.ContentLength,
+            etag: response.ETag ? response.ETag.replace(/"/g, "") : undefined,
+          };
+        } catch (err) {
+          return this.handleError(err, bucketName, cleanKey);
+        }
+      },
+      { operationName: `downloadObjectStream(${bucketName}/${cleanKey})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        console.warn(`[Storage Fallback] MinIO unavailable. Reading '${cleanKey}' from embedded storage.`);
+        const local = await embeddedStorageEngine.getObject(bucketName, cleanKey);
+        const stream = Readable.from(local.body);
+        return {
+          stream,
+          contentType: local.contentType,
+          contentLength: local.contentLength,
+          etag: local.etag,
+        };
+      }
+      throw err;
+    });
   }
 
   /**

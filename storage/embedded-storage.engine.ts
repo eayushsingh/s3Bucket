@@ -318,7 +318,35 @@ export class EmbeddedStorageEngine {
       lastModified: res.lastModified,
     };
   }
+
+  /**
+   * Removes a single object from a bucket.
+   */
+  async deleteObject(bucket: string, key: string): Promise<void> {
+    validateBucketName(bucket);
+    const objPath = this.getObjectPath(bucket, key);
+    if (fs.existsSync(objPath)) {
+      fs.unlinkSync(objPath);
+    }
+    const metaPath = this.getObjectMetaPath(bucket, key);
+    if (fs.existsSync(metaPath)) {
+      fs.unlinkSync(metaPath);
+    }
+  }
+
+  /**
+   * Deletes multiple objects in batch.
+   */
+  async deleteObjects(bucket: string, keys: string[]): Promise<string[]> {
+    const deleted: string[] = [];
+    for (const key of keys) {
+      await this.deleteObject(bucket, key);
+      deleted.push(key);
+    }
+    return deleted;
+  }
 }
+
 
 
 

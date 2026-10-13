@@ -27,3 +27,23 @@ export function isConnectionRefusalError(err: any): boolean {
     message.includes("fetch failed")
   );
 }
+
+export interface AutoRecoveryOptions {
+  maxRetries?: number;
+  retryDelayMs?: number;
+  operationName?: string;
+  enableFallback?: boolean;
+}
+
+export interface RecoveryMetrics {
+  totalAttempts: number;
+  successfulRecoveries: number;
+  fallbacksTriggered: number;
+}
+
+export const recoveryMetrics: RecoveryMetrics = {
+  totalAttempts: 0,
+  successfulRecoveries: 0,
+  fallbacksTriggered: 0,
+};
+

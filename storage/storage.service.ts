@@ -68,13 +68,18 @@ import { embeddedStorageEngine } from "./embedded-storage.engine";
 
 export class StorageService {
   private client: S3Client;
+  private hasCustomClient: boolean;
   private config = loadStorageConfig();
 
   constructor(customClient?: S3Client) {
+    this.hasCustomClient = !!customClient;
     this.client = customClient || getS3Client();
   }
 
   private get s3(): S3Client {
+    if (this.hasCustomClient) {
+      return this.client;
+    }
     return getS3Client();
   }
 

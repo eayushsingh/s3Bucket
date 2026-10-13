@@ -90,3 +90,24 @@ export function getSupervisedProcess(): ChildProcess | null {
   return supervisedProcess;
 }
 
+/**
+ * Terminates the supervised child process cleanly.
+ */
+export function shutdownSupervisedProcess(): void {
+  if (supervisedProcess && !supervisedProcess.killed) {
+    try {
+      supervisedProcess.kill("SIGTERM");
+    } catch {
+      // Ignore if already terminated
+    } finally {
+      supervisedProcess = null;
+    }
+  }
+}
+
+// Register exit hook
+if (typeof process !== "undefined" && process.on) {
+  process.on("beforeExit", shutdownSupervisedProcess);
+}
+
+

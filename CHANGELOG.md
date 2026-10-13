@@ -4,9 +4,20 @@ All notable changes to the **S3-MinIO Storage System** (`s3-minio-storage-system
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
----
+## [1.4.0] - 2026-10-13
+
+### 🛡️ Fixed & Resilient
+- **Permanent MinIO / S3 Connection Refusal (ECONNREFUSED) Resolution**:
+  - Implemented autonomous storage supervisor (`storage/minio-supervisor.ts`) that auto-detects, auto-spawns, and monitors MinIO.
+  - Implemented automated request retry with connection self-healing in `storage.service.ts` (`executeWithResilience`).
+  - Added zero-downtime `EmbeddedStorageEngine` in `storage/embedded-storage.engine.ts` ensuring complete S3 semantic parity when MinIO or Docker is offline.
+  - Added Next.js server lifecycle boot integration via `instrumentation.ts` (`register()` hook).
+  - Enhanced `package.json` with `predev`, `prestart`, `storage:health`, and `storage:watchdog` scripts.
+  - Added unit test suites covering supervisor probes, binary locators, exponential backoff, resilience wrappers, and embedded storage engine.
+  - Resolved TypeScript compilation errors across system stack route, keyboard handlers, about modal, and permissions tab.
 
 ## [1.2.0] - 2026-10-11
+
 
 ### 🚀 Added
 - **Interactive About System & Technology Stack Console**:

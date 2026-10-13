@@ -26,8 +26,8 @@ export async function GET() {
       endpoint: storageConfig.endpoint,
       region: storageConfig.region,
       forcePathStyle: storageConfig.forcePathStyle,
-      presignedPutExpiry: `${storageConfig.presignedPutExpirySeconds}s`,
-      presignedGetExpiry: `${storageConfig.presignedGetExpirySeconds}s`,
+      presignedPutExpiry: `${storageConfig.presignedUploadExpirySeconds}s`,
+      presignedGetExpiry: `${storageConfig.presignedDownloadExpirySeconds}s`,
     },
     auditLedger: {
       engine: "better-sqlite3",

@@ -130,7 +130,57 @@ export class EmbeddedStorageEngine {
       fs.unlinkSync(metaPath);
     }
   }
+
+  /**
+   * Persists an object payload and its metadata sidecar onto local disk.
+   */
+  async putObject(options: {
+    bucket: string;
+    key: string;
+    body: Buffer | Uint8Array | string;
+    contentType?: string;
+    metadata?: Record<string, string>;
+  }): Promise<{ key: string; etag: string; size: number }> {
+    validateBucketName(options.bucket);
+    if (!(await this.bucketExists(options.bucket))) {
+      await this.createBucket(options.bucket);
+    }
+
+    const objPath = this.getObjectPath(options.bucket, options.key);
+    const parentDir = path.dirname(objPath);
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true });
+    }
+
+    const buffer = Buffer.isBuffer(options.body)
+      ? options.body
+      : Buffer.from(options.body);
+
+    fs.writeFileSync(objPath, buffer);
+    const hash = crypto.createHash("md5").update(buffer).digest("hex");
+
+    const record: EmbeddedObjectRecord = {
+      key: options.key,
+      sizeBytes: buffer.length,
+      lastModified: new Date().toISOString(),
+      etag: hash,
+      contentType: options.contentType || "application/octet-stream",
+      metadata: options.metadata || {},
+    };
+
+    fs.writeFileSync(
+      this.getObjectMetaPath(options.bucket, options.key),
+      JSON.stringify(record, null, 2)
+    );
+
+    return {
+      key: options.key,
+      etag: hash,
+      size: buffer.length,
+    };
+  }
 }
+
 
 
 

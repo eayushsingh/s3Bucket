@@ -127,3 +127,40 @@ In `s3Bucket`, the web application acts exclusively as a **Control Plane**:
 - **Secret Isolation**: Root S3 access keys (`STORAGE_ACCESS_KEY` / `STORAGE_SECRET_KEY`) never cross into client JavaScript.
 - **Cryptographic Expiration**: Presigned URLs are time-limited (default 3600 seconds) and bound to a specific HTTP method (`PUT` or `GET`).
 - **Strict Input Normalization**: Keys undergo unicode normalization, null-byte rejection, and path sanitization.
+
+---
+
+## 7. Autonomous Storage Resilience & Self-Healing Architecture
+
+To prevent socket disconnection and connection refusal (`ECONNREFUSED 127.0.0.1:9000`), the storage layer integrates a 3-tier autonomous resilience matrix:
+
+```
++-------------------------------------------------------------+
+|                Incoming S3 Storage Request                  |
++-------------------------------------------------------------+
+                               |
+                               v
+                     [ Try S3 / MinIO API ]
+                               |
+                  +------------+------------+
+                  |                         |
+               Success               ECONNREFUSED
+                  |                         |
+                  v                         v
+               [ Done ]        [ MinIO Supervisor Engine ]
+                                            |
+                         +------------------+------------------+
+                         |                                     |
+              [ Native Binary Spawner ]             [ Embedded Fallback Engine ]
+                         |                                     |
+                         v                                     v
+                 Wait Port 9000 Ready              Local Filesystem Persistence
+                         |                                     |
+                         v                                     v
+               [ Auto-Retry Request ]                     [ Fulfill ]
+```
+
+1. **Autonomous Daemon Supervisor**: `storage/minio-supervisor.ts` continuously monitors port `9000`. If an operation fails with `ECONNREFUSED`, it automatically searches the system for `/opt/homebrew/bin/minio` or system PATH, launches the engine with appropriate credentials, and waits for socket readiness.
+2. **Transparent Auto-Retry**: Requests encountering connection refusal automatically trigger supervisor recovery, reset the cached S3 SDK client instance, and replay the operation with zero user intervention.
+3. **Embedded Filesystem Fallback Engine**: If neither native binary nor Docker can be spawned, the service transparently switches to the `EmbeddedStorageEngine` in `minio_data/`, providing complete semantic parity for bucket creation, object persistence, listing, and streaming without crashing.
+

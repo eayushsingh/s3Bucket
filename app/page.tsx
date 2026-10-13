@@ -150,31 +150,7 @@ function StorageDashboardContent() {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return (
-    <AwsConsoleLayout
-      bucket={selectedBucket}
-      buckets={buckets}
-      objects={objects}
-      prefixes={prefixes}
-      currentPrefix={currentPrefix}
-      onSelectBucket={(b) => setSelectedBucket(b)}
-      onNavigatePrefix={(p) => setCurrentPrefix(p)}
-      onOpenUpload={() => setIsUploadOpen(true)}
-      onOpenMultipart={() => setIsMultipartOpen(true)}
-      onInspectObject={(k) => setDetailTargetKey(k)}
-      onOpenPresignedModal={(k) => setPresignedTargetKey(k)}
-      onDeleteObjects={handleDeleteObjects}
-      onRefresh={fetchObjects}
-      loading={loadingObjects}
-      onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-      onOpenAuditLog={() => setIsAuditLogOpen(true)}
-      onOpenShortcuts={() => setIsShortcutsOpen(true)}
-      onOpenAbout={() => setIsAboutOpen(true)}
-    />
-  );
-
-  // Legacy container retained for modals
-  return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedBucket, fetchObjects, success]);
 
   const handleDeleteObjects = async (keys: string[]) => {

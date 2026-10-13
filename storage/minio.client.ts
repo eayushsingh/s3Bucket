@@ -31,5 +31,21 @@ export function getS3Client(): S3Client {
  * For testing or reconfiguration purposes, allows resetting the cached client.
  */
 export function resetS3Client(): void {
+  if (cachedS3Client) {
+    try {
+      cachedS3Client.destroy();
+    } catch {
+      // Ignore destruction error
+    }
+  }
   cachedS3Client = null;
 }
+
+/**
+ * Destroys existing client connection and immediately creates a fresh instance.
+ */
+export function reconnectS3Client(): S3Client {
+  resetS3Client();
+  return getS3Client();
+}
+

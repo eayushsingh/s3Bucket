@@ -72,7 +72,66 @@ export class EmbeddedStorageEngine {
 
     return { created: true, name: bucketName };
   }
+
+  /**
+   * Lists all existing bucket directories in the embedded data folder.
+   */
+  async listBuckets(): Promise<{ name: string; creationDate?: Date; isDefault?: boolean }[]> {
+    if (!fs.existsSync(this.baseDir)) return [];
+
+    const entries = fs.readdirSync(this.baseDir, { withFileTypes: true });
+    const buckets: { name: string; creationDate?: Date; isDefault?: boolean }[] = [];
+
+    for (const entry of entries) {
+      if (entry.isDirectory() && !entry.name.startsWith(".")) {
+        const metaPath = this.getBucketMetaPath(entry.name);
+        let creationDate = new Date();
+        let isDefault = false;
+
+        if (fs.existsSync(metaPath)) {
+          try {
+            const raw = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+            creationDate = new Date(raw.createdAt);
+            isDefault = !!raw.isDefault;
+          } catch {
+            // Use stat date
+          }
+        }
+
+        buckets.push({
+          name: entry.name,
+          creationDate,
+          isDefault,
+        });
+      }
+    }
+
+    return buckets;
+  }
+
+  /**
+   * Deletes a bucket directory.
+   */
+  async deleteBucket(bucketName: string, force = false): Promise<void> {
+    validateBucketName(bucketName);
+    if (!(await this.bucketExists(bucketName))) {
+      throw new BucketNotFoundError(bucketName);
+    }
+
+    const bPath = this.getBucketPath(bucketName);
+    const files = fs.readdirSync(bPath);
+    if (files.length > 0 && !force) {
+      throw new Error(`Bucket '${bucketName}' is not empty.`);
+    }
+
+    fs.rmSync(bPath, { recursive: true, force: true });
+    const metaPath = this.getBucketMetaPath(bucketName);
+    if (fs.existsSync(metaPath)) {
+      fs.unlinkSync(metaPath);
+    }
+  }
 }
+
 
 
 

@@ -171,20 +171,30 @@ export class StorageService {
    */
   async bucketExists(bucketName: string): Promise<boolean> {
     validateBucketName(bucketName);
-    try {
-      const command = new HeadBucketCommand({ Bucket: bucketName });
-      await this.client.send(command);
-      return true;
-    } catch (err: any) {
-      if (
-        err.name === "NotFound" ||
-        err.name === "NoSuchBucket" ||
-        err.$metadata?.httpStatusCode === 404
-      ) {
-        return false;
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new HeadBucketCommand({ Bucket: bucketName });
+          await this.s3.send(command);
+          return true;
+        } catch (err: any) {
+          if (
+            err.name === "NotFound" ||
+            err.name === "NoSuchBucket" ||
+            err.$metadata?.httpStatusCode === 404
+          ) {
+            return false;
+          }
+          return this.handleError(err, bucketName);
+        }
+      },
+      { operationName: `bucketExists(${bucketName})` }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        return await embeddedStorageEngine.bucketExists(bucketName);
       }
-      return this.handleError(err, bucketName);
-    }
+      throw err;
+    });
   }
 
   /**

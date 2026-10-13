@@ -135,19 +135,35 @@ export class StorageService {
    * Lists all existing buckets in the storage layer.
    */
   async listBuckets(): Promise<BucketInfo[]> {
-    try {
-      const command = new ListBucketsCommand({});
-      const response = await this.client.send(command);
-      const buckets = response.Buckets || [];
+    return executeWithResilience(
+      async () => {
+        try {
+          const command = new ListBucketsCommand({});
+          const response = await this.s3.send(command);
+          const buckets = response.Buckets || [];
 
-      return buckets.map((b) => ({
-        name: b.Name || "",
-        creationDate: b.CreationDate,
-        isDefault: this.config.defaultBuckets.includes(b.Name || ""),
-      }));
-    } catch (err) {
-      return this.handleError(err);
-    }
+          return buckets.map((b) => ({
+            name: b.Name || "",
+            creationDate: b.CreationDate,
+            isDefault: this.config.defaultBuckets.includes(b.Name || ""),
+          }));
+        } catch (err) {
+          return this.handleError(err);
+        }
+      },
+      { operationName: "listBuckets" }
+    ).catch(async (err) => {
+      if (isConnectionRefusalError(err)) {
+        console.warn("[Storage Fallback] MinIO unavailable. Listing buckets from embedded storage.");
+        const local = await embeddedStorageEngine.listBuckets();
+        return local.map((b) => ({
+          name: b.name,
+          creationDate: b.creationDate,
+          isDefault: this.config.defaultBuckets.includes(b.name),
+        }));
+      }
+      throw err;
+    });
   }
 
   /**

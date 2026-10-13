@@ -247,8 +247,31 @@ STORAGE_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
 STORAGE_REGION=auto
 STORAGE_ACCESS_KEY=<R2_ACCESS_KEY_ID>
 STORAGE_SECRET_KEY=<R2_SECRET_ACCESS_KEY>
-STORAGE_FORCE_PATH_STYLE=false
-STORAGE_USE_SSL=true
-```
-
 No application or backend code modifications are needed!
+
+---
+
+## 10. Permanent Resilience & Troubleshooting ECONNREFUSED
+
+If a client encounters `Failed to connect to MinIO/S3 endpoint at http://127.0.0.1:9000: connect ECONNREFUSED 127.0.0.1:9000`:
+
+### Why this occurred historically
+Previously, if Docker was stopped or the local MinIO daemon terminated, the Next.js process had no automatic supervisor to re-launch the process or handle socket failures.
+
+### Permanent Solution Implemented
+1. **Zero-Configuration Autonomous Supervisor**:
+   - `storage/minio-supervisor.ts` automatically runs when the server boots and on connection error.
+   - It searches for native Homebrew or system MinIO (`/opt/homebrew/bin/minio`, `/usr/local/bin/minio`), spawns the server in detached mode, and checks for socket readiness.
+2. **Next.js Server Lifecycle Instrumentation**:
+   - `instrumentation.ts` triggers verification on server boot, ensuring ports 9000 and 9001 are live before any user request.
+3. **Automatic Request Replay**:
+   - S3 operations that hit connection refusal automatically trigger recovery, destroy/refresh the client socket, and replay the operation.
+4. **Embedded Filesystem Fallback Engine**:
+   - If neither MinIO nor Docker is present, `EmbeddedStorageEngine` stores objects directly in `minio_data/`, preventing downtime or user-facing errors.
+5. **CLI Health Tooling**:
+   ```bash
+   npm run storage:health      # Run full diagnostic on ports, daemon, and docker
+   npm run storage:start       # Manually launch supervisor
+   npm run storage:watchdog    # Run persistent health watchdog
+   ```
+

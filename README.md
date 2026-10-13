@@ -98,11 +98,14 @@ Copy `.env.example` to `.env.local`:
 cp .env.example .env.local
 ```
 
-### 4. Start MinIO and Development Server
+### 4. Start Storage Engine and Development Server
 ```bash
-# Automatically boots Docker MinIO daemon (if not running) & starts Next.js dev server
+# Automatically launches autonomous MinIO supervisor & starts Next.js dev server
 npm run dev
 ```
+
+> **Zero-Configuration Self-Healing Guarantee**:
+> If MinIO is not already running, the built-in storage supervisor automatically detects your native MinIO binary or Docker daemon, launches the background engine, and connects seamlessly. If neither is available, it transparently falls back to the embedded filesystem engine without throwing `ECONNREFUSED`!
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -111,6 +114,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **MinIO Admin Web Console**: `http://localhost:9001`
   - *Username*: `minioadmin`
   - *Password*: `minioadmin_secure_password_123`
+
+### Diagnostics & Management
+```bash
+npm run storage:health      # Run full diagnostic on port 9000, docker, and daemon
+npm run storage:start       # Manually trigger supervisor daemon launch
+npm run storage:watchdog    # Run background self-healing watchdog loop
+```
 
 ---
 

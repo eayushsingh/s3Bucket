@@ -49,6 +49,30 @@ export class EmbeddedStorageEngine {
     const bPath = this.getBucketPath(bucketName);
     return fs.existsSync(bPath) && fs.statSync(bPath).isDirectory();
   }
+
+  /**
+   * Creates a new bucket directory idempotently with metadata sidecar.
+   */
+  async createBucket(bucketName: string): Promise<{ created: boolean; name: string }> {
+    validateBucketName(bucketName);
+    const bPath = this.getBucketPath(bucketName);
+
+    if (await this.bucketExists(bucketName)) {
+      return { created: false, name: bucketName };
+    }
+
+    fs.mkdirSync(bPath, { recursive: true });
+
+    const meta: EmbeddedBucketMetadata = {
+      name: bucketName,
+      createdAt: new Date().toISOString(),
+      isDefault: false,
+    };
+    fs.writeFileSync(this.getBucketMetaPath(bucketName), JSON.stringify(meta, null, 2));
+
+    return { created: true, name: bucketName };
+  }
 }
+
 
 

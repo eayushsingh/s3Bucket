@@ -3,9 +3,10 @@ import { loadStorageConfig } from "../storage/storage.config";
 
 async function main() {
   console.log("==================================================");
+  console.log("==================================================");
   console.log("Initializing S3 / MinIO Storage Infrastructure...");
   console.log("==================================================");
-
+  console.log("==================================================");
   const config = loadStorageConfig();
   console.log(`Endpoint: ${config.endpoint}`);
   console.log(`Region:   ${config.region}`);

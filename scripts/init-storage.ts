@@ -31,7 +31,7 @@ async function main() {
     }
 
     console.log("==================================================");
-    console.log("Storage layer initialized successfully!");
+    console.log("Storage layer initialized successfully!!!");
     console.log("==================================================");
     process.exit(0);
   } catch (err: any) {

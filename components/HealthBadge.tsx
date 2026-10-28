@@ -52,7 +52,7 @@ export function HealthBadge({ onOpenDiagnostics }: HealthBadgeProps) {
     return (
       <div className="flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded font-mono text-[11px] text-zinc-400">
         <Activity className="w-3 h-3 animate-spin text-sky-400" />
-        <span>Probing S3 Cluster...</span>
+        <span>Probing S3 Cluster.....</span>
       </div>
     );
   }
